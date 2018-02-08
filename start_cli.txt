@@ -1,0 +1,19 @@
+
+---------------------------------------------------------------------------------------------------
+Ansible version: 2.x.x
+pip list:  apache-libcloud (1.5.0)
+           cs (1.0.0)
+           paramiko (1.15.1)
+           PyYAML (3.10)
+
+system require: sshpass 1.05
+
+ansible config /etc/ansibleansible.cfg: # uncomment this to disable SSH key host checking ansible.cfg
+                             #host_key_checking = False
+
+command cli:
+
+sudo /usr/bin/ansible-playbook -i /var/www/49/php-ansible/Ansible/92a2640b-4896-4082-87c2-e7b49f7ee753/region /var/www/49/php-ansible/Ansible/92a2640b-4896-4082-87c2-e7b49f7ee753/createVM.yml --extra-vars "ansible_ssh_pass=targetsshpass VMname=VMtestPaas1-3337" -vvv
+
+cloudstack.ini : in current directory                
+---------------------------------------------------------------------------------------------------
