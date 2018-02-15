@@ -1,7 +1,7 @@
 ---
 - name: "Testing sudo"
   hosts: all
-  remote_user: karen
+  remote_user: root
   #become: yes
   #become_method: sudo
   #become_user: karen
