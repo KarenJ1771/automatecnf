@@ -2,7 +2,6 @@
 - name: "Testing sudo"
   hosts: all
   remote_user: root
-  timeout: 30
   #become: yes
   #become_method: sudo
   #become_user: karen
