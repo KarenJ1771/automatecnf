@@ -1,13 +1,23 @@
 ---
-- hosts: ovdslave
-  remote_user: ovduser
-  sudo_user: ovduser
-  sudo: yes
-  tasks:     
-   - name: Run the equivalent of "apt-get update" as a separate step   
-     apt:
-        update_cache: yes
-        upgrade: dist
-   - shell: echo "Upgrade Complete"
-     register: out
-   - debug: var=out.stdout_lines
+- name: "Testing sudo"
+  hosts: all
+  remote_user: karen
+  #become: yes
+  #become_method: sudo
+  #become_user: karen
+  vars:
+      ansible_ssh_pipelining: true
+  tasks:
+    - name: "Download app"
+      get_url:
+          url: "http://176.32.192.110/fsextender.tar.gz"
+          dest: "/tmp"
+          mode: 755
+      become: yes
+      become_user: root
+      become_method: su
+      chdir: /tmp
+    - command: tar -xzvf /tmp/fsextender.tar.gz -C /tmp
+      become: yes
+      become_user: root
+      become_method: su
