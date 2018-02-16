@@ -1,6 +1,6 @@
 ---
 - name: "Testing sudo"
-  #hosts: all
+  hosts: {{ ip }}
   #remote_user: root
   #become: yes
   #become_method: sudo
