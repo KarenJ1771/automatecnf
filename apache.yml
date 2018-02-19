@@ -2,5 +2,6 @@
 
 - name: "Hello"
   hosts: all
-     tasks:
-  
+  tasks:
+     - name: Hello World!
+       shell: echo "Hi! Tower is working." 
