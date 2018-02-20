@@ -4,4 +4,4 @@
   hosts: all
   tasks:
      - name: Hello World!
-       shell: echo "Hi! Tower is working." 
+       command: echo "Hi! Tower is working." 
