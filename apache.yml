@@ -5,4 +5,4 @@
   tasks:
      - name: Hello World!
        command: echo "Hi! Tower is working." 
-       timeout: 30
+       timeout: 70
