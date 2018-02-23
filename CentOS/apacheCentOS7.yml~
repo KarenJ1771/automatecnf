@@ -1,0 +1,52 @@
+- command: echo "Hello CentOS"
+- debug:
+    msg: "Install apache on CentOS"
+- yum:
+     name: httpd
+     state: latest
+- service:
+      name: httpd
+      state: restarted
+      enabled: yes
+- copy:
+    src: index.php
+    dest: /var/www/html/index.php
+    owner: apache
+    group: apache
+    mode: 0755
+- firewalld:
+     zone: public
+     service: http
+     permanent: true
+     state: enabled
+- firewalld:
+     port: 80/tcp
+     permanent: true
+     state: enabled
+#- yum:
+#     name: mariadb-server
+#     state: latest
+#- yum:
+#     name: mariadb
+#     state: latest
+#- service:
+#         name: mariadb
+#         state: restarted
+#         enabled: yes
+#- firewalld:
+#        port: 3306/tcp
+#        permanent: true
+#       state: enabled
+#- yum:
+#     name: php
+#     state: latest
+#- yum:
+#     name: php-mysql
+#     state: latest
+- service:
+     name: httpd
+     state: restarted
+- command: "sudo firewall-cmd --reload"
+
+- name: "Send notify"
+  include_tasks: "notify_mail.yml"

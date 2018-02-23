@@ -1,0 +1,129 @@
+- name: install MySQL client 
+  apt: name=mariadb-client update_cache=yes state=latest
+- name: install MySQL server 
+  apt: name=mariadb-server update_cache=yes state=latest      
+- name: install python-mysqldb
+  apt: name=python-mysqldb update_cache=yes state=latest
+- name: install python-pip
+  apt: name=python-pip update_cache=yes state=latest
+- name: install python-dev
+  apt: name=python-dev update_cache=yes state=latest
+- name: install libmysqlclient-dev
+  apt: name=libmysqlclient-dev update_cache=yes state=latest
+- name: install python-MySQLdb
+  apt: name=python-MySQLdb update_cache=yes state=latest
+- name: install libmariadbclient-dev
+  apt: name=libmariadbclient-dev update_cache=yes state=latest 
+- name: install MySQL python lib 
+  apt: name=libmariadbclient-dev update_cache=yes state=latest
+- name: Install MySQL-Python  module
+  pip: name=MySQL-python
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 3306
+    state: present
+
+- service:
+      name: mysql
+      state: restarted
+      enabled: yes 
+ 
+- name: delete anonymous MySQL server user for {{ ansible_hostname }}
+  action: mysql_user user="" host="{{ ansible_hostname }}" state="absent"
+ 
+- name: delete anonymous MySQL server user for localhost
+  action: mysql_user user="" state="absent"
+ 
+- name: remove the MySQL test database
+  action: mysql_db db=test state=absent
+        
+- name: Change root user password on first run
+  mysql_user: login_user=root
+              login_password=''
+              name=root
+              password={{ passR }}
+              priv=*.*:ALL,GRANT
+              host={{ item }}
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- service:
+      name: mysql
+      state: restarted
+      enabled: yes
+
+- name: Install PHP
+  apt: name=php7.0 update_cache=yes state=latest
+- name: Install php7.0-mysql
+  apt: name=php7.0-mysql update_cache=yes state=latest
+- name: install apache2
+  apt: name=apache2 update_cache=yes state=latest
+- name: install libapache2-mod-php7.0
+  apt: name=libapache2-mod-php7.0 update_cache=yes state=latest
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 80
+    state: present
+
+- copy:
+    src: index.php
+    dest: /var/www/html/index.php
+    owner: www-data
+    group: www-data
+    mode: 0755
+
+- name: Delete index.html file
+  file:
+    path: /var/www/html/index.html
+    state: absent
+   
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes
+
+- name: enabled mod_rewrite
+  apache2_module: name=rewrite state=present
+
+- name: apache2 listen on port {{ http_port }}
+  lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen " line="Listen {{ http_port }}" state=present
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes  
+
+- name: apache2 virtualhost on port {{ http_port }}
+  lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:" line="<VirtualHost *:{{ http_port }}>"
+
+- name: create virtual host file
+  template: src=virtualhost.conf dest=/etc/apache2/sites-available/{{ domain }}.conf
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes  
+
+- name: a2ensite {{ domain }}
+  command: a2ensite {{ domain }}
+  args:
+    creates: /etc/apache2/sites-enabled/{{ domain }}.conf
+   
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes    
+
+#- name: "Send notify"
+#  include_tasks: "notify_mail.yml"

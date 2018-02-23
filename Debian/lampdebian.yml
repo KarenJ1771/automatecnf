@@ -1,0 +1,163 @@
+- name: install apache2
+  apt: name=apache2 update_cache=yes state=latest
+- name: Install apache2-doc
+  apt: name=apache2-doc update_cache=yes state=latest
+- name: Install apache2-utils
+  apt: name=apache2-utils update_cache=yes state=latest
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 80
+    state: present
+
+- copy:
+    src: mpm_prefork.conf    
+    dest: /etc/apache2/mods-available/
+    owner: root
+    group: root
+    mode: 0644
+
+- copy:
+    src: mpm_event.conf    
+    dest: /etc/apache2/mods-available/
+    owner: root
+    group: root
+    mode: 0644
+
+- copy:
+    src: index.php
+    dest: /var/www/html/index.php
+    owner: www-data
+    group: www-data
+    mode: 0755
+
+- name: Delete index.html file
+  file:
+    path: /var/www/html/index.html
+    state: absent
+
+- name: apache2 KeepAlive off
+  lineinfile: dest=/etc/apache2/apache2.conf regexp="^KeepAlive " line="KeepAlive Off"
+   
+- command: "a2dismod mpm_event" 
+- command: "a2enmod mpm_prefork"
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes
+
+- name: enabled mod_rewrite
+  apache2_module: name=rewrite state=present
+
+- name: apache2 listen on port {{ http_port }}
+  lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen " line="Listen {{ http_port }}" state=present
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes  
+
+- name: apache2 virtualhost on port {{ http_port }}
+  lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:" line="<VirtualHost *:{{ http_port }}>"
+
+
+- name: create virtual host file
+  template: src=virtualhost.conf dest=/etc/apache2/sites-available/{{ domain }}.conf
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes  
+
+- name: a2ensite {{ domain }}
+  command: a2ensite {{ domain }}
+  args:
+    creates: /etc/apache2/sites-enabled/{{ domain }}.conf
+
+- name: Install apache2 scripting support
+  apt: name=libapache2-mod-perl2 update_cache=yes state=latest
+- name: Install libapache2-mod-python
+  apt: name=libapache2-mod-python update_cache=yes state=latest  
+    
+- name: Install PHP
+  apt: name=php5 update_cache=yes state=latest
+- name: Install libapache2-mod-php5
+  apt: name=libapache2-mod-php5 update_cache=yes state=latest 
+- name: Install php5-common
+  apt: name=php5-common update_cache=yes state=latest 
+- name: Install php5-cli
+  apt: name=php5-cli update_cache=yes state=latest 
+- name: Install php-pear
+  apt: name=php-pear update_cache=yes state=latest 
+- name: Install php5-gd
+  apt: name=php5-gd update_cache=yes state=latest 
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes    
+
+- name: install MySQL server
+  apt: name=mysql-server update_cache=yes state=latest
+ 
+- name: install php5-mysql
+  apt: name=php5-mysql update_cache=yes state=latest    
+- name: install pip
+  apt: name=python-pip update_cache=yes state=latest
+- name: install python-dev
+  apt: name=python-dev update_cache=yes state=latest 
+- name: install libmysqlclient-dev
+  apt: name=libmysqlclient-dev update_cache=yes state=latest      
+- name: install python-mysqldb
+  apt: name=python-mysqldb update_cache=yes state=latest
+- name: Install MySQL-Python  module
+  pip: name=MySQL-python
+
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 3306
+    state: present
+
+- service:
+      name: mysql
+      state: restarted
+      enabled: yes 
+ 
+- name: Set the root password 
+  mysql_user: login_user=root login_password="" user=root password="{{ passR }}"
+
+- name: Secure the root user for IPV6 localhost (::1)
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="::1"
+
+- name: Secure the root user for IPV4 localhost (127.0.0.1)
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="127.0.0.1"
+
+- name: Secure the root user for localhost domain
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="localhost"
+
+- name: Secure the root user for server_hostname domain
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="{{ ansible_fqdn }}"
+
+- name: Deletes anonymous server user
+  mysql_user: login_user=root login_password="{{ passR }}" user="" host_all=yes state=absent
+
+- name: Removes the test database
+  mysql_db: login_user=root login_password="{{ passR }}" db=test state=absent
+#######
+- service:
+      name: mysql
+      state: restarted
+      enabled: yes

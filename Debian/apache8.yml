@@ -1,0 +1,97 @@
+- command: echo "Apache on Debian "
+
+- debug:
+    msg: "Install Apache on Debian 8 on port={{ http_port }} and domain is {{ domain }}"
+   
+- name: install apache2
+  apt: name=apache2 update_cache=yes state=latest
+  with_items:
+    - apache2-doc
+    - apache2-utils
+
+- name: apache2 KeepAlive off
+  lineinfile: dest=/etc/apache2/apache2.conf regexp="^KeepAlive " line="KeepAlive Off"
+
+- command: "a2dismod mpm_event" 
+- command: "a2enmod mpm_prefork"
+#- name: disable mpm_event
+#  apache2_module: name=mpm_event state=absent
+#  force: True
+#- name: enable mpm_event
+#  apache2_module: name=mpm_prefork state=present
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 80
+    state: present
+
+- copy:
+    src: mpm_prefork.conf    
+    dest: /etc/apache2/mods-available/
+    owner: root
+    group: root
+    mode: 0644
+
+- copy:
+    src: mpm_event.conf    
+    dest: /etc/apache2/mods-available/
+    owner: root
+    group: root
+    mode: 0644
+    
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes
+
+- name: enabled mod_rewrite
+  apache2_module: name=rewrite state=present
+
+
+- name: apache2 listen on port {{ http_port }}
+  lineinfile: dest=/etc/apache2/ports.conf regexp="^Listen " line="Listen {{ http_port }}" state=present
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes  
+
+- name: apache2 virtualhost on port {{ http_port }}
+  lineinfile: dest=/etc/apache2/sites-available/000-default.conf regexp="^<VirtualHost \*:" line="<VirtualHost *:{{ http_port }}>"
+
+
+- name: create virtual host file
+  template: src=virtualhost.conf dest=/etc/apache2/sites-available/{{ domain }}.conf
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes  
+
+- name: a2ensite {{ domain }}
+  command: a2ensite {{ domain }}
+  args:
+    creates: /etc/apache2/sites-enabled/{{ domain }}.conf
+
+- name: Install apache2 scripting support
+  apt: 
+    name: libapache2-mod-perl2
+    state: present
+  apt:
+    name: libapache2-mod-python
+    state: present
+  apt:
+    name: php5
+    state: present
+  apt:
+    name: php-pear
+    state: present
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes    
+

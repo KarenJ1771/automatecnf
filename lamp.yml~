@@ -15,39 +15,39 @@
   tasks:
 ############# CentOS #####################
     - name: "Cent OS 6"
-      include_tasks: "CentOS/apacheCentOS6.yml"
+      include_tasks: "CentOS/lampcentos6.yml"
       when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'
 
     - name: "Cent OS 7"
-      include_tasks: "CentOS/apacheCentOS7.yml"
+      include_tasks: "CentOS/lampcentos7.yml"
       when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "7" or ansible_distribution == 'Red Hat Enterprise Linux'
 
 ############# Ubuntu ######################
 
     - name: "Ubuntu 16"
-      include_tasks: "Ubuntu/apache16.yml"
+      include_tasks: "Ubuntu/lampubuntu.yml"
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial' and ansible_distribution_version == '16.04'
 
     - name: "Ubuntu 14"
-      include_tasks: "Ubuntu/apache16.yml" 
+      include_tasks: "Ubuntu/lampubuntu14.yml" 
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and ansible_distribution_version == '14.04'
 
     - name: "Ubuntu 17"    
-      include_tasks: "Ubuntu/apache16.yml"
+      include_tasks: "Ubuntu/lampubuntu.yml"
       when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'zesty' and ansible_distribution_version == '17.04'
 
 ####### Debian ############################
 
     - name: "Debian 9"
-      include_tasks: "Debian/apache8.yml"
+      include_tasks: "Debian/lampdebian.yml"
       when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
 
     - name: "Debian 8"
-      include_tasks: "Debian/apache8.yml"
+      include_tasks: "Debian/lampdebian.yml"
       when: ansible_distribution == 'Debian' and ansible_distribution_release == 'jessie' and ansible_distribution_major_version == '8'
 
     - name: "Debian 7"
-      include_tasks: "Debian/apache8.yml"
+      include_tasks: "Debian/lampdebian9.yml"
       when: ansible_distribution == 'Debian' and ansible_distribution_release == 'wheezy' and ansible_distribution_major_version == '7'
 
 ########### SUSE  #########################

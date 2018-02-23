@@ -1,0 +1,95 @@
+- yum:
+     name: libselinux-python
+     state: latest 
+- yum:
+     name: httpd
+     state: latest
+- service:
+      name: httpd
+      state: restarted
+      enabled: yes
+
+- copy:
+    src: index.php
+    dest: /var/www/html/index.php
+    owner: apache
+    group: apache
+    mode: 0755
+
+- name: Delete index.html file
+  file:
+    path: /var/www/html/index.html
+    state: absent
+
+- name: Apache | add apache iptable rule
+  command: /sbin/iptables -I INPUT 1 -p tcp --dport http -j ACCEPT -m comment --comment "Apache"
+
+- name: save iptables
+  command: iptables-save
+  become: yes
+
+- yum:
+     name: mysql-server
+     state: latest
+
+- service:
+     name: mysqld
+     state: restarted
+     enabled: yes
+
+- name: Mysql server | add mysql to iptable rule
+  command: /sbin/iptables -I INPUT 1 -p tcp --dport 3306 -j ACCEPT -m comment --comment "MySQL"
+
+- name: save iptables
+  command: iptables-save
+  become: yes
+
+- yum:
+     name: php
+     state: latest
+- yum:
+     name: php-mysql
+     state: latest
+- service:
+     name: httpd
+     state: restarted
+
+#- command: "sudo firewall-cmd --reload"
+########
+##- name: Adds Python MySQL support on Debian/Ubuntu
+##  apt: pkg="python-mysqldb" state=present
+##  when: ansible_os_family == 'Debian'
+
+- name: Adds Python MySQL support on RedHat/CentOS
+  yum: name=MySQL-python state=present
+  when: ansible_os_family == 'RedHat'
+
+- name: Set the root password 
+  mysql_user: login_user=root login_password="" user=root password="{{ passR }}"
+
+- name: Secure the root user for IPV6 localhost (::1)
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="::1"
+
+- name: Secure the root user for IPV4 localhost (127.0.0.1)
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="127.0.0.1"
+
+- name: Secure the root user for localhost domain
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="localhost"
+
+- name: Secure the root user for server_hostname domain
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="{{ ansible_fqdn }}"
+
+- name: Deletes anonymous server user
+  mysql_user: login_user=root login_password="{{ passR }}" user="" host_all=yes state=absent
+
+- name: Removes the test database
+  mysql_db: login_user=root login_password="{{ passR }}" db=test state=absent
+
+- service:
+     name: mysqld
+     state: restarted
+     enabled: yes
+
+- name: "Send notify"
+  include_tasks: "notify_mail.yml"
+

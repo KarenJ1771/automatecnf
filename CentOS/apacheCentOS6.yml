@@ -1,0 +1,67 @@
+- command: echo "Hello CentOS"
+- debug:
+    msg: "Install apache on CentOS"
+- yum:
+     name: libselinux-python
+     state: latest
+- yum:
+     name: httpd
+     state: latest
+- service:
+      name: httpd
+      state: restarted
+      enabled: yes
+- copy:
+    src: index.html
+    dest: /var/www/html/index.html
+    owner: apache
+    group: apache
+    mode: 0755
+
+- name: Apache | add apache iptable rule
+  command: /sbin/iptables -I INPUT 1 -p tcp --dport http -j ACCEPT -m comment --comment "Apache"
+#  sudo: true
+#  when: iptablesrules.stdout.find("Apache") == -1
+ 
+- name: save iptables
+  command: iptables-save
+#  sudo: true
+  become: yes
+
+#- iptables:
+#    chain: INPUT
+#    match: state
+#    protocol: tcp
+#    policy: ACCEPT
+#    destination_port: 80
+#    state: present
+
+
+#- yum:
+#     name: mariadb-server
+#     state: latest
+#- yum:
+#     name: mariadb
+#     state: latest
+#- service:
+#         name: mariadb
+#         state: restarted
+#         enabled: yes
+#- firewalld:
+#        port: 3306/tcp
+#        permanent: true
+#       state: enabled
+#- yum:
+#     name: php
+#     state: latest
+#- yum:
+#     name: php-mysql
+#     state: latest
+
+- service:
+     name: httpd
+     state: restarted
+- command: "sudo firewall-cmd --reload"
+
+#- name: "Send notify"
+#  include_tasks: "notify_mail.yml"
