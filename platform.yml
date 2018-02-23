@@ -1,6 +1,6 @@
 ---
 
-- name: "Platform Independ test"
+- name: "Check Platform "
   hosts: all
   connection: paramiko
   vars:
@@ -63,6 +63,8 @@
 
 
 ###  Important!!! #################
+##  Fri 23 Feb 2018 06:33:08 PM +04 
+##
 ## when: (ansible_distribution == "CentOS" and ansible_distribution_major_version == "6") or
 ##       (ansible_distribution == "Debian" and ansible_distribution_major_version == "7")
 ## ansible-playbook -i 176.32.195.91,  --extra-vars 'usrR=root passR=PmbNVj3Rkuhb' platform.yml
