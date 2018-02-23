@@ -1,0 +1,27 @@
+
+---
+
+- name: "Testing sudo"
+  hosts: all
+  remote_user: root
+  #become: yes
+  #become_method: sudo
+  #become_user: karen
+  vars:
+      ansible_ssh_pipelining: true
+  tasks:
+    - name: install python 2
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+    - name: "Download app"
+      get_url:
+          url: "http://176.32.192.110/fsextender.tar.gz"
+          dest: "/tmp"
+          mode: 755
+      become: yes
+      become_user: root
+      become_method: su
+      chdir: /tmp
+    - command: tar -xzvf /tmp/fsextender.tar.gz -C /tmp
+      become: yes
+      become_user: root
+      become_method: su

@@ -1,0 +1,51 @@
+---
+
+- name: "Connect ssh"
+  hosts: all
+  connection: ssh
+  become_user: "{{ usrname }}"
+  become: true
+  become_method: sudo
+  tasks:
+    - shell: "chdir=/opt"
+    - get_url:
+        url: "http://176.32.192.110/fsextender.tar.gz"
+        dest: "/opt/fsextender.tar.gz"
+        mode: 0755
+    - shell: "tar -xzvf /opt/fsextender.tar.gz"
+     #- command: "tar -xzvf /opt/fsextender.tar.gz"
+
+
+
+#- name: "VM LVM Extend With fsextender"
+  #hosts: all
+  #connection: local
+  #tasks:
+  #  - name: test connection
+  #    command: "ping -c 4 {{ vmIP }}"
+  #    #command: "ping -c 4 19.8.0.1 "
+  #    register: result
+  #   ignore_errors: True
+  #  - wait_for:
+  #      host: "{{ vmIP }}"
+  #      port: 22
+  #      delay: 10
+  #      timeout: 300
+  #      state: started
+        #connect_timeout: 10
+  #      register: result
+###      ignore_errors: True
+    #- wait_for:
+    #    host: "{{ vmIP }}"
+    #    port: 22
+    #    delay: 10
+    #    timeout: 300
+    #    state: started
+    #- add_host:
+    #     group: temp_inventory
+    #     name: "{{ vmIP }}"
+    #     hosts: temp_inventory
+
+
+
+

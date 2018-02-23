@@ -1,0 +1,22 @@
+---
+- hosts: XXXXXXXXXX
+  sudo: yes
+
+  tasks:
+      - name:  test connection
+        ping:
+      - name:  Add OVD repository as one of your package sources: 
+        shell: wget -O - http://archive.ulteo.com/ovd/4.0.3/ubuntu/dists/trusty/ulteo_lists > /etc/apt/sources.list.d/ulteo_ovd.list
+      - name:  Add OVD sertificate
+        shell: wget -O - http://archive.ulteo.com/ovd/4.0.3/ubuntu/dists/trusty/keyring | apt-key add -
+      - name: Update system sources information
+        apt:
+           update_cache: yes
+           ulteo-ovd-slaveserver-role-aps
+           ulteo-ovd-slaveserver-role-fs
+           apt-get install ulteo-ovd-desktop
+      - name: Restart OVD slaveserver service
+        shell: /etc/init.d/ulteo-ovd-slaveserver restart
+        register: out
+      - debug: var=out.stdout_lines   
+
