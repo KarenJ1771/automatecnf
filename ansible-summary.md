@@ -811,3 +811,6 @@ playbooks_vault.html
     Usage: ansible-pull [options] [playbook.yml]
 
     ansible-pull: error: URL for repository not specified, use -h for help
+    
+    
+##    Ru  site for Ansible https://letsclearitup.com.ua/ubuntu/znakomstvo-s-ansible-chast1-vvedenie.html
