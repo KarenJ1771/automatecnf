@@ -15,15 +15,50 @@
     - debug:
         msg: "CentOS or RHEL"
       when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'
+############# Ubuntu ######################
 
-    - command: echo "Debian or Ubuntu"
+    - command: echo "Ubuntu"
     - debug:
-        msg: "Ubuntu or Debian"
-      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+        msg: "Ubuntu {{ ansible_distribution_version }}"
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'precise' and ansible_distribution_version == '12.04'
+
+    - command: echo "Ubuntu"
+    - debug:
+        msg: "Ubuntu {{ ansible_distribution_version }}"
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and ansible_distribution_version == '14.04'
+
+    - command: echo "Ubuntu"
+    - debug:
+        msg: "Ubuntu {{ ansible_distribution_version }}"
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial' and ansible_distribution_version == '16.04'
+
+    - command: echo "Ubuntu"
+    - debug:
+        msg: "Ubuntu {{ ansible_distribution_version }}"
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'zesty' and ansible_distribution_version == '17.04'
+
+####### Debian ############################
+
+    - command: echo "Debian "
+    - debug:
+        msg: "Debian {{ ansible_distribution_version }} "
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
+
+    - command: echo "Debian "
+    - debug:
+        msg: "Debian {{ ansible_distribution_version }} "
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'jessie' and ansible_distribution_major_version == '8'
+
+    - command: echo "Debian "
+    - debug:
+        msg: "Debian {{ ansible_distribution_version }} "
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'wheezy' and ansible_distribution_major_version == '7'
+
+########### SUSE  #########################
     - command: echo "openSUSE Leap"
     - debug:
-        msg: "openSUSE Leap"
-      when: ansible_distribution == 'openSUSE Leap' and ansible_distribution_major_version == "42"
+        msg: "openSUSE Leap {{ ansible_distribution_version }} "
+      when: ansible_distribution == 'openSUSE Leap' and ansible_distribution_version == "42.2"
 
 
 
