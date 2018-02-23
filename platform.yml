@@ -20,6 +20,11 @@
     - debug:
         msg: "Ubuntu or Debian"
       when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+    - command: echo "openSUSE Leap"
+    - debug:
+        msg: "openSUSE Leap"
+      when: ansible_distribution == 'openSUSE Leap' and ansible_distribution_major_version == "42"
+
 
 
 ###  Important!!! #################
@@ -33,5 +38,27 @@
 #- set_fact:
 #  destination: "/etc/nrpe.d/"
 #  when: ansible_os_family == "RedHat"
+
+#    "ansible_distribution": "CentOS",
+#    "ansible_distribution_release": "Final",
+#    "ansible_distribution_version": "5.9"
+
+#    "ansible_distribution": "CentOS",
+#    "ansible_distribution_release": "Final",
+#    "ansible_distribution_version": "6.4"
+
+#    "ansible_distribution": "Ubuntu",
+#    "ansible_distribution_release": "lucid",
+#    "ansible_distribution_version": "10.04"
+
+#    "ansible_distribution": "Ubuntu",
+#    "ansible_distribution_release": "precise",
+#    "ansible_distribution_version": "12.04"
+
+#    "ansible_distribution": "Debian",
+#    "ansible_distribution_release": "wheezy",
+#    "ansible_distribution_version": "7"
+
+
 ##########################################
 
