@@ -2,7 +2,7 @@
 
 - name: "Check Platform "
   hosts: all
-  connection: paramiko
+#  connection: paramiko
   vars:
       ansible_ssh_user: "{{ usrR }}"
       ansible_ssh_pass: "{{ passR }}"
