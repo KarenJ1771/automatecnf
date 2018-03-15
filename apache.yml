@@ -4,8 +4,8 @@
   hosts: all
 #  connection: paramiko
   vars:
-      ansible_ssh_user: "{{ usrR }}"
-      ansible_ssh_pass: "{{ passR }}"
+#      ansible_ssh_user: "{{ usrR }}"
+#      ansible_ssh_pass: "{{ passR }}"
       http_port: 80
       domain: example.com
 #     ansible_paramiko_user: "{{ usrR }}"
@@ -14,7 +14,7 @@
 #      ansible_ssh_pass: passphrase_for_private_key
   tasks:
 ############# CentOS #####################
-  - name: "Cent OS 6"
+    - name: "Cent OS 6"
       include_tasks: "CentOS/apacheCentOS6.yml"
       when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'  
 
