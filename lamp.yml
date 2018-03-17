@@ -18,7 +18,7 @@
   - debug:
       msg: "openSUSE Leap {{ ansible_distribution_version }} "     
   - import_tasks: "../Debian/lampdebian9.yml"
-  when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
+    when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
   #- name: "Debian 8" 
   #  import_tasks: "Debian/lampdebian.yml"
   #  when: ansible_distribution == 'Debian' and ansible_distribution_release == 'jessie' and ansible_distribution_major_version == '8'
