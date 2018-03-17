@@ -14,7 +14,7 @@
 #      ansible_ssh_pass: passphrase_for_private_key
   tasks:
       #- name: "Debian 9" 
-      - command: echo "openSUSE Leap"
+      #- command: echo "openSUSE Leap"
       - include_tasks: "platform.yml"
         when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
     
