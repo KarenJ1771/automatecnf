@@ -17,8 +17,7 @@
   #     command: echo "openSUSE Leap"
   - include_tasks: "platform.yml
     when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
-  #     debug:
-  #       msg: "openSUSE Leap {{ ansible_distribution_version }} "     
+    
    
   #- name: "Debian 8" 
   #  import_tasks: "Debian/lampdebian.yml"
