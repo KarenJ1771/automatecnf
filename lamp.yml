@@ -12,7 +12,7 @@
       #- name: "Debian 9" 
       #- command: echo "openSUSE Leap"
   - command:  echo "Debian"    
-  - include_tasks: 'platform.yml'
+    include_tasks: 'platform.yml'
     when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
     
    
