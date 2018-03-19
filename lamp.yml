@@ -3,7 +3,7 @@
 - name: "Check Platform "
   hosts: all
 #  gather_facts: true
-#  connection: paramiko
+  connection: paramiko
   vars:
 #      ansible_ssh_user: "{{ usrR }}"
 #      ansible_ssh_pass: "{{ passR }}"
@@ -11,8 +11,8 @@
       domain: example.com
   tasks:
      - name: "Debian 9" 
-          include_tasks: "Debian/lampdebian9.yml"
-          when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
+       include_tasks: "Debian/lampdebian9.yml"
+       when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
     
    
   #- name: "Debian 8" 
