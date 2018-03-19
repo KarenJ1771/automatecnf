@@ -5,8 +5,8 @@
 #  gather_facts: true
   connection: paramiko
   vars:
-#      ansible_ssh_user: "{{ usrR }}"
-#      ansible_ssh_pass: "{{ passR }}"
+      ansible_ssh_user: "{{ usrR }}"
+      ansible_ssh_pass: "{{ passR }}"
       http_port: 80
       domain: example.com
   tasks:
