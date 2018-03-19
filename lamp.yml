@@ -14,8 +14,8 @@
      #- command: echo "OK"
      - include_tasks: "Debian/lampdebian9.yml"
        when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
-     - debug:
-          msg: "{{ ansible_version }}"
+#     - debug:
+#          msg: "{{ ansible_version }}"
    
 #    - name: "Debian 8" 
      - include_tasks: "Debian/lampdebian.yml"
@@ -25,27 +25,25 @@
        when: ansible_distribution == 'Debian' and ansible_distribution_release == 'wheezy' and ansible_distribution_major_verion == '7'
        
 #    - name: "Cent OS 6"
-#      include_tasks: "CentOS/lampcentos6.yml"
-#      when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'
+     - include_tasks: "CentOS/lampcentos6.yml"
+       when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'
 
 #    - name: "Cent OS 7"
-#      include_tasks: "CentOS/lampcentos7.yml"
-#      when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "7" or ansible_distribution == 'Red Hat Enterprise Linux'
+     - include_tasks: "CentOS/lampcentos7.yml"
+       when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "7" or ansible_distribution == 'Red Hat Enterprise Linux'
 
 #    - name: "Ubuntu 16"
-#      include_tasks: "Ubuntu/lampubuntu.yml"
-#      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial' and ansible_distribution_version == '16.04'
+     - include_tasks: "Ubuntu/lampubuntu.yml"
+       when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'xenial' and ansible_distribution_version == '16.04'
 
 #    - name: "Ubuntu 14"
-#      include_tasks: "Ubuntu/lampubuntu14.yml" 
-#      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and ansible_distribution_version == '14.04'
+     - include_tasks: "Ubuntu/lampubuntu14.yml" 
+       when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'trusty' and ansible_distribution_version == '14.04'
 
 #    - name: "Ubuntu 17"    
-#      include_tasks: "Ubuntu/lampubuntu.yml"
-#      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'zesty' and ansible_distribution_version == '17.04'
-
-
-
+     - include_tasks: "Ubuntu/lampubuntu.yml"
+       when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'zesty' and ansible_distribution_version == '17.04'
+       
   #- command: echo "openSUSE Leap"
   #- debug:
   #    msg: "openSUSE Leap {{ ansible_distribution_version }} "
