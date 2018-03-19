@@ -44,9 +44,9 @@
 
 
 
-  - command: echo "openSUSE Leap"
-  - debug:
-      msg: "openSUSE Leap {{ ansible_distribution_version }} "
-    when: ansible_distribution == 'openSUSE Leap' and ansible_distribution_version == "42.2"
+  #- command: echo "openSUSE Leap"
+  #- debug:
+  #    msg: "openSUSE Leap {{ ansible_distribution_version }} "
+  #  when: ansible_distribution == 'openSUSE Leap' and ansible_distribution_version == "42.2"
 
 ###########################################
