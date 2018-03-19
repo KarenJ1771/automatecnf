@@ -4,14 +4,14 @@
   hosts: all
 #  gather_facts: true
 #  connection: paramiko
-#  vars:
+  vars:
 #      ansible_ssh_user: "{{ usrR }}"
 #      ansible_ssh_pass: "{{ passR }}"
- #     http_port: 80
- #     domain: example.com
+      http_port: 80
+      domain: example.com
   tasks:
-   # - name: "Debian 9" 
-  - include_tasks: Debian/lampdebian9.yml
+  - name: "Debian 9" 
+    include_tasks: Debian/lampdebian9.yml
     when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
     
    
@@ -44,9 +44,9 @@
 
 
 
-#    - command: echo "openSUSE Leap"
-#    - debug:
-#        msg: "openSUSE Leap {{ ansible_distribution_version }} "
-#      when: ansible_distribution == 'openSUSE Leap' and ansible_distribution_version == "42.2"
+    - command: echo "openSUSE Leap"
+    - debug:
+        msg: "openSUSE Leap {{ ansible_distribution_version }} "
+      when: ansible_distribution == 'openSUSE Leap' and ansible_distribution_version == "42.2"
 
 ###########################################
