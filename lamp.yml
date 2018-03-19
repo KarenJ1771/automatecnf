@@ -4,11 +4,11 @@
   hosts: all
 #  gather_facts: true
 #  connection: paramiko
-  vars:
+#  vars:
 #      ansible_ssh_user: "{{ usrR }}"
 #      ansible_ssh_pass: "{{ passR }}"
-      http_port: 80
-      domain: example.com
+ #     http_port: 80
+ #     domain: example.com
   tasks:
    # - name: "Debian 9" 
   - include_tasks: Debian/lampdebian9.yml
