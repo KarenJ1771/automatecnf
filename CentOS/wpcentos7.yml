@@ -44,7 +44,7 @@
 
 ##### END ##################
 - service:
-     name: mysqld
+     name: mariadb
      state: restarted
      enabled: yes
 
