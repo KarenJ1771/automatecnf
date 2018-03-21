@@ -12,8 +12,7 @@
   apt: name=default-libmysqlclient-dev update_cache=yes state=latest
 - name: install libmariadbclient-dev
   apt: name=libmariadbclient-dev update_cache=yes state=latest 
-- name: install MySQL python lib 
-  apt: name=libmariadbclient-dev update_cache=yes state=latest
+
 - name: Install MySQL-Python  module
   pip: name=MySQL-python
 
