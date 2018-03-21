@@ -1,7 +1,7 @@
+- name: install MySQL server 
+  apt: name=mariadb-server update_cache=yes state=latest
 - name: install MySQL client 
   apt: name=mariadb-client update_cache=yes state=latest
-- name: install MySQL server 
-  apt: name=mariadb-server update_cache=yes state=latest      
 - name: install python-mysqldb
   apt: name=python-mysqldb update_cache=yes state=latest
 - name: install python-pip
