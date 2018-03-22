@@ -137,7 +137,7 @@
       name: apache2
       state: restarted
       enabled: yes    
-
+      
 - copy:
     src: mariadbPASS.sql
     dest: /tmp/mariadbPASS.sql
@@ -147,8 +147,13 @@
 
 - name: insert PASS
   lineinfile: dest=/tmp/mariadbPASS.sql regexp="^update user set password" line="update user set password=PASSWORD(\"{{ passR }}\") where User='root';"  
-   
-- command: "mysql -u root -p {{ passR }} < /tmp/mariadbPASS.sql"
+  
+- raw: "mysql mysql < /tmp/mariadbPASS.sql"
+
+- service:
+      name: mysql
+      state: restarted
+      enabled: yes 
 
 - name: Delete mariadbPASS.sql file
   file:
