@@ -138,5 +138,22 @@
       state: restarted
       enabled: yes    
 
+- copy:
+    src: mariadbPASS.sql
+    dest: /tmp/mariadbPASS.sql
+    owner: mysql
+    group: mysql
+    mode: 0755
+
+- name: insert PASS
+  lineinfile: dest=/tmp/mariadbPASS.sql regexp="^update user set password" line="update user set password=PASSWORD(\"{{ passR }}\") where User='root';"  
+   
+- command: "mysql -u root -p {{ passR }} < /tmp/mariadbPASS.sql"
+
+- name: Delete mariadbPASS.sql file
+  file:
+    path: /tmp/mariadbPASS.sql
+    state: absent
+
 #- name: "Send notify"
 #  include_tasks: "notify_mail.yml"
