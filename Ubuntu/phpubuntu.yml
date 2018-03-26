@@ -1,0 +1,12 @@
+- include_tasks: "apache16.yml"
+- name: install php
+  apt: name=php update_cache=yes state=latest
+
+- name: install libapache2-mod-php
+  apt: name=libapache2-mod-php update_cache=yes state=latest
+
+- name: install php-mcrypt 
+  apt: name=php-mcrypt update_cache=yes state=latest
+
+- name: "Restart Apache"   
+  service: name=apache2 state=restarted
