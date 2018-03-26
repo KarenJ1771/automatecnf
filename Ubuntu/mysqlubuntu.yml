@@ -1,0 +1,61 @@
+- command: "sudo sed -i -re 's/([a-z]{2}.)?archive.ubuntu.com|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'zesty' and ansible_distribution_version == '17.04'
+
+- name: install mysql server
+  apt: name=mysql-server update_cache=yes state=latest
+
+- name: "Restart Mysql"  
+  service: name=mysql state=restarted
+
+- ufw:
+    state: enabled
+    policy: allow
+
+- ufw:
+    rule: allow
+    name: OpenSSH
+    port: 22
+
+- ufw:
+    rule: allow
+    port: 3306
+    proto: tcp
+
+- name: install pip
+  apt: name=python-pip update_cache=yes state=latest
+
+- name: install python-dev
+  apt: name=python-dev update_cache=yes state=latest
+ 
+- name: install libmysqlclient-dev
+  apt: name=libmysqlclient-dev update_cache=yes state=latest
+
+- name: install python-mysqldb
+  apt: name=python-mysqldb update_cache=yes state=latest
+- name: install libmysqlclient20
+  apt: name=libmysqlclient20 update_cache=yes state=latest
+
+- name: delete anonymous MySQL server user for {{ ansible_hostname }}
+  action: mysql_user user="" host="{{ ansible_hostname }}" state="absent"
+ 
+- name: delete anonymous MySQL server user for localhost
+  action: mysql_user user="" state="absent"
+ 
+- name: remove the MySQL test database
+  action: mysql_db db=test state=absent
+
+- name: Change root user password on first run
+  mysql_user: login_user=root
+              login_password=' '
+              name=root
+              password={{ passR }}
+              priv=*.*:ALL,GRANT
+              host={{ item }}
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: "Restart Mysql"
+  service: name=mysql state=restarted
