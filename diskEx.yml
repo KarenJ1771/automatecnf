@@ -12,8 +12,7 @@
         url: "http://176.32.192.110/fsextender.tar.gz"
         dest: "/opt/fsextender.tar.gz"
         mode: 0755
-    - shell: "tar -xzvf /opt/fsextender.tar.gz"
-     #- command: "tar -xzvf /opt/fsextender.tar.gz"
+    - command: "tar -xzvf /opt/fsextender.tar.gz -C /opt"
 
 
 
