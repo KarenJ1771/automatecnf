@@ -1,0 +1,53 @@
+- yum:
+     name: mariadb-server
+     state: latest
+- yum:
+     name: mariadb
+     state: latest
+- service:
+     name: mariadb
+     state: restarted
+     enabled: yes
+- firewalld:
+     port: 3306/tcp
+     permanent: true
+     state: enabled
+
+- command: "sudo firewall-cmd --reload"
+
+- yum:
+     name: python-pip
+     state: latest
+- yum:
+     name: MySQL-python
+     state: latest
+- service:
+     name: mariadb
+     state: restarted
+     enabled: yes
+
+- name: Set the root password 
+  mysql_user: login_user=root login_password="" user=root password="{{ passR }}"
+
+- name: Secure the root user for IPV6 localhost (::1)
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="::1"
+
+- name: Secure the root user for IPV4 localhost (127.0.0.1)
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="127.0.0.1"
+
+- name: Secure the root user for localhost domain
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="localhost"
+
+- name: Secure the root user for server_hostname domain
+  mysql_user: login_user=root login_password="{{ passR }}" user=root password="{{ passR }}" host="{{ ansible_fqdn }}"
+
+- name: Deletes anonymous server user
+  mysql_user: login_user=root login_password="{{ passR }}" user="" host_all=yes state=absent
+
+- name: Removes the test database
+  mysql_db: login_user=root login_password="{{ passR }}" db=test state=absent
+
+- service:
+     name: mariadb
+     state: restarted
+     enabled: yes
