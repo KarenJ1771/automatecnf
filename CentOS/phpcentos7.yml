@@ -1,0 +1,10 @@
+- include_tasks: "apacheCentOS7.yml"
+- yum:
+     name: php
+     state: latest
+- yum:
+     name: php-mysql
+     state: latest
+- service:
+     name: httpd
+     state: restarted
