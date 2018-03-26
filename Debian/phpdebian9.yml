@@ -1,0 +1,14 @@
+- include_tasks: "apache8.yml"
+- name: Install PHP
+  apt: name=php7.0 update_cache=yes state=latest
+- name: Install php7.0-mysql
+  apt: name=php7.0-mysql update_cache=yes state=latest
+- name: install apache2
+  apt: name=apache2 update_cache=yes state=latest
+- name: install libapache2-mod-php7.0
+  apt: name=libapache2-mod-php7.0 update_cache=yes state=latest
+
+- service:
+      name: apache2
+      state: restarted
+      enabled: yes
