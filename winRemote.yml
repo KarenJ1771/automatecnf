@@ -6,7 +6,7 @@
   vars:
       ansible_user: "{{ usrR }}"
 #      ansible_password: "{{ passR }}"
-      ansible_password: "interadmin11!!"
+      ansible_password: "winAdminPass"
       ansible_connection: winrm
       ansible_winrm_server_cert_validation: ignore
 #      http_port: 80
