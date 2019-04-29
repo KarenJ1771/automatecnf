@@ -1,0 +1,17 @@
+[Unit]
+Description = making GraphiteReceiver is up and collect VMWare  VCenter metrics 
+After=network.target
+After=httpd.service
+After=carbon-cache.service
+After=carbon-aggregator.service
+After=grafana-server.service
+After=mariadb.service
+
+[Service]
+ExecStart =/opt/statsfeeder/vcenterfeeder.sh
+RemainAfterExit=true
+StandardOutput=journal
+
+
+[Install]
+WantedBy = multi-user.target
