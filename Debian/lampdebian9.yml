@@ -1,23 +1,9 @@
-- name: Update APT package cache
-  apt: update_cache=yes cache_valid_time=600
-- name: Upgrade APT to the latest packages
-  apt: upgrade=dist
-  register: apt_result
-  
-- name: Autoremove unused packages
-  command: apt-get -y autoremove
-  register: apt_result
-  changed_when: "'packages will be REMOVED' in apt_result.stdout"
-  
-- name: Purge residual kernel packages
-  shell: apt-get remove -y --purge $(dpkg -l | grep "^rc\s*linux-image-" | awk '{print $2}' | tr '\n' ' ')
-  register: apt_result
-  changed_when: "'packages will be REMOVED' in apt_result.stdout"
-  
-- name: install MySQL server 
-  apt: name=mariadb-server update_cache=yes state=latest
+#- wait_for: path=/var/lib/dpkg/lock state=absent
 - name: install MySQL client 
   apt: name=mariadb-client update_cache=yes state=latest
+ 
+- name: install MySQL server 
+  apt: name=mariadb-server update_cache=yes state=latest      
 - name: install python-mysqldb
   apt: name=python-mysqldb update_cache=yes state=latest
 - name: install python-pip
@@ -66,11 +52,6 @@
     - 127.0.0.1
     - ::1
     - localhost
-
-- service:
-      name: mysql
-      state: restarted
-      enabled: yes
 
 - name: Install PHP
   apt: name=php7.0 update_cache=yes state=latest
@@ -136,8 +117,8 @@
 - service:
       name: apache2
       state: restarted
-      enabled: yes    
-      
+      enabled: yes
+    
 - copy:
     src: mariadbPASS.sql
     dest: /tmp/mariadbPASS.sql
@@ -148,6 +129,7 @@
 - name: insert PASS
   lineinfile: dest=/tmp/mariadbPASS.sql regexp="^update user set password" line="update user set password=PASSWORD(\"{{ passR }}\") where User='root';"  
   
+
 - raw: "mysql mysql < /tmp/mariadbPASS.sql"
 
 - service:
@@ -160,5 +142,5 @@
     path: /tmp/mariadbPASS.sql
     state: absent
 
-#- name: "Send notify"
-#  include_tasks: "notify_mail.yml"
+###- name: "Send notify"
+###  include_tasks: "notify_mail.yml"

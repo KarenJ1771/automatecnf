@@ -1,0 +1,91 @@
+### Stop Daily update ###
+- command: "systemctl stop apt-daily.timer"
+- command: "systemctl disable apt-daily.timer"
+- command: "systemctl disable apt-daily.service"
+- command: "systemctl daemon-reload"
+
+- name: Kill apt daily
+  command: "pkill apt"
+  ignore_errors: true
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "Ansible system setenforce 0"
+  async: 1
+  poll: 0
+  ignore_errors: true
+
+- name: "Wait for reboot"
+  local_action: wait_for host={{ ansible_default_ipv4.address }} port=22 delay=10 state=started
+  become: false
+
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install NGINX web server
+  apt: name=nginx update_cache=yes state=latest    
+
+- service:
+     name: nginx
+     state: restarted
+     enabled: yes
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 80
+    state: present
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 443
+    state: present
+
+- shell: iptables-save > /etc/iptables/rules.v4
+
+- service:
+     name: nginx
+     state: restarted
+     enabled: yes
+
+### Disable Desktop ####
+- command: "systemctl set-default multi-user.target"
+- command: "echo 0 >/selinux/enforce"
+
+#AWX job notify
+- mail:
+    host: mx.ucloudspace.am
+    port: 25
+    secure: starttls
+    username: "jobnotify@ucloudspace.am"
+    password: "6H2a6L8s#6H2a6L8s"
+    subject: JOB-report 
+    body: "Diar User!  Job coplete! Installation NGINX web server on Debian 9.
+           The default server root directory (top level directory containing configuration files): /etc/nginx.
+           The main Nginx configuration file: /etc/nginx/nginx.conf.
+           Server block (virtual hosts) configurations can be added in: /etc/nginx/conf.d.
+           The default server document root directory (contains web files): /usr/share/nginx/html."
+    from: "jobnotify@ucloudspace.am"
+    to:  "{{ Usrmail }}"
+    #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+    #attach: /etc/group /tmp/pavatar2.png
+    headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+    charset: utf8
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after NGINX installation"
+  async: 1
+  poll: 0
+  ignore_errors: true 

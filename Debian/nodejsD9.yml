@@ -1,0 +1,65 @@
+### Stop Daily update ###
+- command: "systemctl stop apt-daily.timer"
+- command: "systemctl disable apt-daily.timer"
+- command: "systemctl disable apt-daily.service"
+- command: "systemctl daemon-reload"
+
+- name: Kill apt daily
+  command: "pkill apt"
+  ignore_errors: true
+
+- command: "systemctl set-default multi-user.target"
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "Ansible system setenforce 0"
+  async: 1
+  poll: 0
+  ignore_errors: true
+
+- name: "Wait for reboot"
+  local_action: wait_for host={{ ansible_default_ipv4.address }} port=22 delay=10 state=started
+  become: false
+
+#- raw: "dpkg --configure -a"
+- raw: "apt --fix-broken install -y"
+- name: Nodejs script download
+  get_url: 
+    url: https://deb.nodesource.com/setup_8.x 
+    dest: /tmp/nodejsetup.sh
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Nodejs script start
+  shell: /tmp/nodejsetup.sh
+
+- name: install nodejs
+  apt: name=nodejs update_cache=yes state=latest
+
+- name: install build-essential
+  apt: name=build-essential update_cache=yes state=latest
+
+#   # #AWX job notify
+- mail:
+    host: mx.ucloudspace.am
+    port: 25
+    secure: starttls
+    username: "jobnotify@ucloudspace.am"
+    password: "6H2a6L8s#6H2a6L8s"
+    subject: JOB-report 
+    body: "Diar User!  Job coplete! Installation NodeJS v8 on Debian 9 ."
+    from: "jobnotify@ucloudspace.am"
+    to:  "{{ Usrmail }}"
+    #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+    #attach: /etc/group /tmp/pavatar2.png
+    headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+    charset: utf8
+#  delegate_to: localhost 
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after NodeJS installation"
+  async: 1
+  poll: 0
+  ignore_errors: true

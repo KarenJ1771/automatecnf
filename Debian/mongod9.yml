@@ -1,0 +1,106 @@
+### Stop Daily update ###
+- command: "systemctl stop apt-daily.timer"
+- command: "systemctl disable apt-daily.timer"
+- command: "systemctl disable apt-daily.service"
+- command: "systemctl daemon-reload"
+
+- name: Kill apt daily
+  command: "pkill apt"
+  ignore_errors: true
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "Ansible system setenforce 0"
+  async: 1
+  poll: 0
+  ignore_errors: true
+
+- name: "Wait for reboot"
+  local_action: wait_for host={{ ansible_default_ipv4.address }} port=22 delay=10 state=started
+  become: false
+
+- name: install dirmngr
+  apt: name=dirmngr update_cache=yes state=latest
+
+- name: Add an Apt signing key, will not download if present
+  apt_key:
+    id: 9DA31620334BD75D9DCB49F368818C72E52529D4
+    keyserver: hkp://keyserver.ubuntu.com:80
+    state: present
+
+- name: Ansible create repo
+  copy:
+    dest: "/etc/apt/sources.list.d/mongodb-org-4.0.list"
+    content: |
+      deb http://repo.mongodb.org/apt/debian stretch/mongodb-org/4.0 main
+      
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install Mongodb-org 4 
+  apt: name=mongodb-org=4.0.0 update_cache=yes state=installed
+
+- name: install Mongodb-org-server 4 
+  apt: name=mongodb-org-server=4.0.0 update_cache=yes state=installed
+
+- name: install Mongodb-org-shell 4 
+  apt: name=mongodb-org-shell=4.0.0 update_cache=yes state=installed 
+
+- name: install Mongodb-org-mongos 4
+  apt: name=mongodb-org-mongos=4.0.0 update_cache=yes state=installed
+
+- name: install Mongodb-org-tools 4 
+  apt: name=mongodb-org-tools=4.0.0 update_cache=yes state=installed 
+  
+- name: install libcurl
+  apt: name=libcurl3 update_cache=yes state=latest
+
+- name: install openssl
+  apt: name=openssl  update_cache=yes state=latest
+
+- service:
+     name: mongod
+     state: restarted
+     enabled: yes
+
+- mail:
+   host: mx.ucloudspace.am
+   port: 25
+   secure: starttls
+   username: "jobnotify@ucloudspace.am"
+   password: "6H2a6L8s#6H2a6L8s"
+   subject: JOB-report 
+   body: "Diar User!  Job coplete! Installation MongoDB Community on Debian 9 ."
+   from: "jobnotify@ucloudspace.am"
+   to:  "{{ Usrmail }}"
+   #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+   #attach: /etc/group /tmp/pavatar2.png
+   headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+   charset: utf8
+
+## Disable Desktop ####
+- command: "systemctl set-default multi-user.target"
+
+- iptables:
+    chain: INPUT
+    match: tcp
+    protocol: tcp
+    jump: ACCEPT
+    destination_port: 27017
+    state: present
+
+- shell: iptables-save > /etc/iptables/rules.v4
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after MongoDB installation"
+  async: 1
+  poll: 0
+  ignore_errors: true
+

@@ -1,0 +1,119 @@
+### Stop Daily update ###
+- command: "systemctl stop apt-daily.timer"
+- command: "systemctl disable apt-daily.timer"
+- command: "systemctl disable apt-daily.service"
+- command: "systemctl daemon-reload"
+
+- name: Kill apt daily
+  command: "pkill apt"
+  ignore_errors: true
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "Ansible system setenforce 0"
+  async: 1
+  poll: 0
+  ignore_errors: true
+
+- name: "Wait for reboot"
+  local_action: wait_for host={{ ansible_default_ipv4.address }} port=22 delay=10 state=started
+  become: false
+
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- copy:
+    src: "RESOURCES/iRedMail-0.9.7.tar.bz2"
+    dest: /opt/iRedMail-0.9.7.tar.bz2
+    owner: root
+    group: root
+    mode: 0644
+
+- command: "tar -xvjf /opt/iRedMail-0.9.7.tar.bz2 -C /opt"
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "/opt/iRedMail-0.9.7.tar.bz2"
+
+- copy:
+    src: "RESOURCES/config"
+    dest: /opt/iRedMail-0.9.7/config
+    owner: root
+    group: root
+    mode: 0644
+
+- name: config DOMAIN_ADMIN_PASSWD_PLAIN
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export DOMAIN_ADMIN_PASSWD_PLAIN=" line="export DOMAIN_ADMIN_PASSWD_PLAIN=\'{{passR}}\'"    
+
+- name: config MYSQL_ROOT_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export MYSQL_ROOT_PASSWD=" line="export MYSQL_ROOT_PASSWD=\'{{passR}}\'"    
+
+- name: config VMAIL_DB_BIND_PASSWD  
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export VMAIL_DB_BIND_PASSWD=" line="export VMAIL_DB_BIND_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'"
+
+- name: config VMAIL_DB_ADMIN_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export VMAIL_DB_ADMIN_PASSWD=" line="export VMAIL_DB_ADMIN_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'"      
+
+- name: config AMAVISD_DB_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export AMAVISD_DB_PASSWD=" line="export AMAVISD_DB_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'" 
+
+- name: config IREDADMIN_DB_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export IREDADMIN_DB_PASSWD=" line="export IREDADMIN_DB_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'"   
+
+- name: config RCM_DB_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export RCM_DB_PASSWD=" line="export RCM_DB_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'"   
+
+- name: config SOGO_DB_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export SOGO_DB_PASSWD=" line="export SOGO_DB_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'"   
+
+- name: config SOGO_SIEVE_MASTER_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export SOGO_SIEVE_MASTER_PASSWD=" line="export SOGO_SIEVE_MASTER_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'"  
+
+- name: config IREDAPD_DB_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/config regexp="export IREDAPD_DB_PASSWD=" line="export IREDAPD_DB_PASSWD=\'{{ lookup('password', '/dev/null length=30 chars=ascii_letters') }}\'"    
+    
+- copy:
+    src: "RESOURCES/unat.sh"
+    dest: /opt/iRedMail-0.9.7/unat.sh
+    owner: root
+    group: root
+    mode: 0755 
+
+- name: config IREDAPD_DB_PASSWD
+  lineinfile: dest=/opt/iRedMail-0.9.7/unat.sh regexp="#!/usr/bin/bash" line="#!/bin/bash"    
+
+### Disable Desktop ####
+- command: "systemctl set-default multi-user.target"
+- command: "echo 0 >/selinux/enforce"
+- command: "/opt/iRedMail-0.9.7/unat.sh"
+
+##AWX job notify
+- mail:
+    host: mx.ucloudspace.am
+    port: 25
+    secure: starttls
+    username: "jobnotify@ucloudspace.am"
+    password: "6H2a6L8s#6H2a6L8s"
+    subject: JOB-report 
+    body: "Diar User!  Job coplete! Installation iRedmail on Debian 9 .For more /opt/iRedMail-0.9.7/config and iRadMail.tips"
+    from: "jobnotify@ucloudspace.am"
+    to:  "{{ Usrmail }}"
+    #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+    #attach: /etc/group /tmp/pavatar2.png
+    headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+    charset: utf8
+#  delegate_to: localhost 
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after iRedmail installation"
+  async: 1
+  poll: 0
+  ignore_errors: true
+  
