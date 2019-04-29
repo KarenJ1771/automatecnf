@@ -1,0 +1,49 @@
+# gather_facts: False
+# pre_tasks:
+#   - name: Install python for Ansible
+#     raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+#     changed_when: False
+#   - setup: # aka gather_facts
+- command: "sudo sed -i -re 's/([a-z]{2}.)?archive.ubuntu.com|security.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list"
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'zesty' and ansible_distribution_version == '17.04'
+
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    upgrade: yes
+    update_cache: yes
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install dirmngr
+  apt: name=dirmngr update_cache=yes state=latest
+
+- name: install mongodb-clients
+  apt: name=mongodb-clients update_cache=yes state=latest
+
+- name: install mongodb
+  apt: name=mongodb update_cache=yes state=latest
+
+- mail:
+   host: mx.ucloudspace.am
+   port: 25
+   secure: starttls
+   username: "jobnotify@ucloudspace.am"
+   password: "6H2a6L8s#6H2a6L8s"
+   subject: JOB-report 
+   body: "Diar User!  Job coplete! Installation MongoDB enterprise on UBUNTU 17 LTS ."
+   from: "jobnotify@ucloudspace.am"
+   to:  "{{ Usrmail }}"
+   #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+   #attach: /etc/group /tmp/pavatar2.png
+   headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+   charset: utf8
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after MongoDB installation"
+  async: 1
+  poll: 0
+  ignore_errors: true

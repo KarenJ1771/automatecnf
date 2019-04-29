@@ -1,0 +1,83 @@
+# gather_facts: False
+# pre_tasks:
+#   - name: Install python for Ansible
+#     raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
+#     changed_when: False
+#   - setup: # aka gather_facts
+
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install dirmngr
+  apt: name=dirmngr update_cache=yes state=latest
+
+- name: Add an Apt signing key, will not download if present
+  apt_key:
+    id: EA312927
+    keyserver: hkp://keyserver.ubuntu.com:80
+    state: present
+
+- name: Ansible create repo
+  copy:
+    dest: "/etc/apt/sources.list.d/mongodb-org-3.2.list"
+    content: |
+      deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse
+      
+# - name: Upgrade all packages to the latest version
+#   apt:
+#     name: "*"
+#     state: latest
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+        
+- name: install mongodb-org
+  apt: name=mongodb-org update_cache=yes state=latest
+
+- service:
+     name: mongod
+     state: restarted
+     enabled: yes
+
+- ufw:
+    state: enabled
+    policy: allow
+
+- ufw:
+    rule: allow
+    name: OpenSSH
+    port: 22
+
+- ufw:
+    rule: allow
+    port: 27017
+    proto: tcp
+
+- mail:
+   host: mx.ucloudspace.am
+   port: 25
+   secure: starttls
+   username: "jobnotify@ucloudspace.am"
+   password: "6H2a6L8s#6H2a6L8s"
+   subject: JOB-report 
+   body: "Diar User!  Job coplete! Installation MongoDB enterprise on UBUNTU 16 LTS ."
+   from: "jobnotify@ucloudspace.am"
+   to:  "{{ Usrmail }}"
+   #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+   #attach: /etc/group /tmp/pavatar2.png
+   headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+   charset: utf8
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after MongoDB installation"
+  async: 1
+  poll: 0
+  ignore_errors: true
