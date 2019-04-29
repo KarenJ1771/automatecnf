@@ -1,25 +1,30 @@
 ---
 
-- name: "Connect ssh"
+- name: "VM LVM Extend With fsextender"
   hosts: all
-  connection: ssh
-  become_user: "{{ usrname }}"
-  become: true
-  become_method: sudo
+  connection: paramiko
+  vars:
+    ansible_ssh_user: "{{ usrR }}"
+    ansible_ssh_pass: "{{ passR }}"
   tasks:
-    - shell: "chdir=/opt"
-    - get_url:
-        url: "http://176.32.192.110/fsextender.tar.gz"
-        dest: "/opt/fsextender.tar.gz"
-        mode: 0755
-    - command: "tar -xzvf /opt/fsextender.tar.gz -C /opt"
+#    - shell: "chdir=/opt"
+#    - get_url:
+#        url: "http://176.32.192.110/fsextender.tar.gz"
+#        dest: "/opt/fsextender.tar.gz"
+#        mode: 0755
+#    - command: "tar -xzvf /opt/fsextender.tar.gz -C /opt"
 
+ #    - raw: lvdisplay -C|awk '$1=="root" {print $2}'
+ #    - command: blkid 
+     - name: Get partition list
+       command: lsblk
+       register: lsblk_list
+       changed_when: false
+     - name: Rescan LVM Volume Groups
+       command: vgscan
+       #when: ((lvm__register_devices_filter|d() and lvm__register_devices_filter.changed) or
+       #      (lvm__register_devices_global_filter|d() and lvm__register_devices_global_filter.changed))
 
-
-#- name: "VM LVM Extend With fsextender"
-  #hosts: all
-  #connection: local
-  #tasks:
   #  - name: test connection
   #    command: "ping -c 4 {{ vmIP }}"
   #    #command: "ping -c 4 19.8.0.1 "

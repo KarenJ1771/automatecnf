@@ -17,3 +17,7 @@ sudo /usr/bin/ansible-playbook -i /var/www/49/php-ansible/Ansible/92a2640b-4896-
 
 cloudstack.ini : in current directory                
 ---------------------------------------------------------------------------------------------------
+
+
+
+sudo ansible-playbook -i IP.AD.RE.SS,  --extra-vars 'usrR=root passR=password Usrmail=k.jalovyan@gmail.com' graphite.yml -vvv

@@ -1,0 +1,30 @@
+---
+
+- name: "Check Platform "
+  hosts: all
+  connection: paramiko
+  vars:
+      ansible_ssh_user: "{{ usrR }}"
+      ansible_ssh_pass: "{{ passR }}"
+      http_port: 80
+      domain: example.com
+#     ansible_paramiko_user: "{{ usrR }}"
+#     ansible_paramiko_pass: "{{ passR }}"
+#      ansible_ssh_private_key_file: /path/to/private_key
+#      ansible_ssh_pass: passphrase_for_private_key
+      
+  tasks:    
+    - name: "Cent OS 7"      
+      include_tasks: "CentOS/mongocos7.yml"
+      when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "7" or ansible_distribution == 'Red Hat Enterprise Linux'
+
+    - name: "Ubuntu"
+      include_tasks: "Ubuntu/mongou17.yml"
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'zesty' and ansible_distribution_version == '17.04'
+
+    - name: "Debian 9"
+      include_tasks: "Debian/mongod9.yml"
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'stretch' and ansible_distribution_major_version == '9'
+
+###########################################
+

@@ -1,1 +1,12 @@
+---
 
+- Установка JAVA
+- Узнать размер Java Heap Memory Size
+- # useradd -s /sbin/nologin -d /usr/local/tomcat9/temp tomcat or # useradd -r tomcat --shell /bin/false
+
+- # cd /usr/local/src && wget http://www-eu.apache.org/dist/tomcat/tomcat-9/v9.0.1/bin/apache-tomcat-9.0.1.tar.gz
+#  tar xfvz /usr/local/src/apache-tomcat-*.tar.gz -C /usr/local/
+# rm -f /usr/local/src/apache-tomcat-9*.tar.gz
+# mv /usr/local/apache-tomcat-9.0.1 /usr/local/tomcat9
+# chown -R tomcat. /usr/local/tomcat9
+$ /usr/local/tomcat9/bin/startup.sh

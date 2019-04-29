@@ -2,10 +2,10 @@
 
 - name: "Check Platform "
   hosts: all
-#  connection: paramiko
+  connection: paramiko
   vars:
-#      ansible_ssh_user: "{{ usrR }}"
-#      ansible_ssh_pass: "{{ passR }}"
+      ansible_ssh_user: "{{ usrR }}"
+      ansible_ssh_pass: "{{ passR }}"
       http_port: 80
       domain: example.com
 #     ansible_paramiko_user: "{{ usrR }}"
@@ -16,7 +16,7 @@
 ############# CentOS #####################
     - name: "Cent OS 6"
       include_tasks: "CentOS/apacheCentOS6.yml"
-      when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'  
+      when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'
 
     - name: "Cent OS 7"
       include_tasks: "CentOS/apacheCentOS7.yml"

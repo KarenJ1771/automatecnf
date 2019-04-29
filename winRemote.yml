@@ -1,0 +1,42 @@
+---
+
+- name: "WinRM"
+  hosts: all
+  connection: winrm
+  vars:
+      ansible_user: "{{ usrR }}"
+#      ansible_password: "{{ passR }}"
+      ansible_password: "interadmin11!!"
+      ansible_connection: winrm
+      ansible_winrm_server_cert_validation: ignore
+#      http_port: 80
+#      domain: example.com
+#     ansible_paramiko_user: "{{ usrR }}"
+#     ansible_paramiko_pass: "{{ passR }}"
+#      ansible_ssh_private_key_file: /path/to/private_key
+#      ansible_ssh_pass: passphrase_for_private_key
+  tasks: 
+     - debug: msg=" OS is {{ansible_distribution}}"    
+     - name: Test the PsExec connection to the local system (target node) with your user       
+       win_psexec:
+         #command: whoami.exe
+         #command: ipconfig.exe > C:\Users\Administrator\Documents\ip.txt
+         command: '-i C:\Users\Administrator\Documents\PSTools\pskill.exe -t firefox.exe'
+         #interactive: no
+         #system: yes
+#      - name: Windows product key My Variant 
+#        win_psexec:
+#           command: '-i cscript c:\windows\system32\slmgr.vbs /ipk <enter your 25-digit product key here>'           
+#######  Windows product key ###############
+####  slmgr.vbs /ipk <enter your 25-digit product key here>
+####Type in:  cd c:\windows\system32  then press the Enter key.
+ ####Type in:  cscript c:\windows\system32\slmgr.vbs /ato  then press the Enter key.
+#  Response example        
+#  ok: [server1] => {
+# "msg": [
+#     "ansible_distribution Microsoft Windows Server 2008 R2 Standard ",
+#     "major version 6",
+#     "version 6.1.7601.65536"
+# ]
+#         # when: ansible_distribution == 'Windows'
+        # debug: msg="My release is {{ansible_distribution}}"    
