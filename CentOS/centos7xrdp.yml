@@ -1,0 +1,56 @@
+- command: echo "Hello CentOS"
+- debug:
+    msg: "Install Server with GUI CentOS7 package group"
+- yum:
+     name: "@Server with GUI"
+     state: present
+
+- name: is graphical currently active
+     command: systemctl set-default graphical.target
+
+- name: Activate whitout restart
+     command: systemctl start graphical.target
+
+#CentOs with enabled EPEL repo 
+## RHEL/CentOS 7 64-Bit ##
+# wget http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+# rpm -ivh epel-release-latest-7.noarch.rpm
+
+## RHEL/CentOS 6 32-Bit ##
+# wget http://dl.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+# rpm -ivh epel-release-6-8.noarch.rpm
+## RHEL/CentOS 6 64-Bit ##
+# wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+# rpm -ivh epel-release-6-8.noarch.rpm
+
+# yum repolist
+
+######## OR #################
+# sudo yum install epel-release
+#-yum:
+#   name: epel-release
+#   state: latest 
+##############################
+-yum:
+    name: xrdp
+    state: latest
+
+#https://sergeyvasin.net/2016/05/13/xrdp-centos/
+
+- name: For SeLinux
+- command: "chcon -t bin_t /usr/sbin/xrdp"
+
+- name: For SeLinux1
+- command: "chcon -t bin_t /usr/sbin/xrdp-sesman"
+
+- service:
+     name: xrdp
+     state: start
+     enabled: yes
+
+- firewalld:
+     port: 3389/tcp
+     permanent: true
+     state: enabled
+- command: "sudo firewall-cmd --reload"
+

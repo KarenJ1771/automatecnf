@@ -1,0 +1,151 @@
+- name: "Install LAMP prerequisite application"
+  include_tasks: "lampcentos7.yml"
+
+- mysql_db:
+    name: graphite
+    state: present
+    login_password: '{{ passR }}'
+    login_user: root
+
+#- name: Set mysql grapfite user privileges
+- mysql_user:
+    name: graphite
+    password: '{{ passR }}'    
+    host: 'localhost'
+    priv: "graphite.*:ALL"
+    state: present
+    login_user: root
+    login_password: '{{ passR }}'
+
+## Revoke(remove) all privileges for user 'graphite' and password 
+##- mysql_user:
+##    name: graphite
+##    password: '{{ passR }}'
+##    priv: "*.*:USAGE"
+##    state: present
+##    login_user: root
+##    login_password: '{{ passR }}'
+
+##- name: upgrade all packages
+##  yum:
+##    name: '*'
+##    state: latest
+
+- pip:
+    name: pexpect
+    state: latest
+
+# Install graphite web
+- yum:
+     name: graphite-web
+     state: latest 
+  
+- firewalld:
+     port: 2003/tcp
+     permanent: true
+     state: enabled
+
+- firewalld:
+     port: 2003/udp
+     permanent: true
+     state: enabled
+
+- copy:
+    src: res1/local_settings.py
+    dest: /etc/graphite-web/local_settings.py
+    owner: apache
+    group: apache
+    mode: 0644
+
+- name: Change config line
+  lineinfile: dest=/etc/graphite-web/local_settings.py regexp="\'PASSWORD\'\:" line="        'PASSWORD\':\'{{ passR }}\',"
+
+- copy:
+    src: res1/graphite-web.conf
+    dest: /etc/httpd/conf.d/graphite-web.conf
+    owner: apache
+    group: apache
+    mode: 0644
+
+- name: Case insensitve password string match
+  expect:
+    echo: yes
+    command: "/usr/lib/python2.7/site-packages/graphite/manage.py syncdb"
+    responses:
+      You just installed Django's auth system, which means you don't have any superusers defined.: "yes"   
+      Would you like to create one now\? \(yes\/no\): "yes"
+      Username (leave blank to use \'root\'): 'root11'
+      Email address: "graphite@localhost"
+      Password: '{{ passR }}'
+      Password (again): '{{ passR }}'
+
+- service:
+     name: httpd
+     state: restarted
+
+# Install python-carbon
+- yum:
+     name: python-carbon
+     state: latest
+
+# Install python-whisper
+- yum:
+     name: python-whisper
+     state: latest
+
+- service:
+     name: carbon-cache
+     state: restarted
+     enabled: yes     
+
+- command: "setsebool -P httpd_can_network_connect on"
+- command: "setsebool -P collectd_tcp_network_connect on"     
+
+- service:
+     name: carbon-cache
+     state: restarted
+     enabled: yes
+
+- command: "chown -R apache. /var/lib/graphite-web"
+
+- copy:
+    src: res1/storage-schemas.conf
+    dest: /etc/carbon/storage-schemas.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- pip:
+    name: collectd
+    state: latest
+
+- copy:
+    src: res1/statsfeeder.tar.gz
+    dest: /opt/statsfeeder.tar.gz
+    owner: root
+    group: root
+    mode: 0644
+
+- command: "tar -xzvf /opt/statsfeeder.tar.gz -C /opt"
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "/opt/statsfeeder.tar.gz"
+
+## As a service script
+- copy:
+    src: res1/vcenterCollector.service
+    dest: /usr/lib/systemd/system/vcenterCollector.service
+    owner: root
+    group: root
+    mode: 0644  
+
+- command: "systemctl enable vcenterCollector.service"
+## add IP with name to hosts and change config
+
+- firewalld:
+     port: 3000/tcp
+     permanent: true
+     state: enabled
+
+## Other vmware stats collector install with maven 

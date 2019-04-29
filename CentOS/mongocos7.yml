@@ -1,0 +1,53 @@
+- copy:
+    src: "res1/mongodb-org.repo"
+    dest: /etc/yum.repos.d/mongodb-org.repo
+    owner: root
+    group: root
+    mode: 0644
+
+- command: "yum repolist"
+
+- yum:
+    name: mongodb-org
+    state: latest
+
+- service:
+      name: mongod
+      state: started      
+
+- name: Add mongodb multithread
+  lineinfile:
+    dest=/etc/security/limits.d/20-nproc.conf
+    line="mongod     soft    nproc     32000"
+    owner=root
+
+- service:
+      name: mongod
+      state: restarted
+      enabled: yes
+
+#AWX job notify
+- mail:
+    host: mx.ucloudspace.am
+    port: 25
+    secure: starttls
+    username: "jobnotify@ucloudspace.am"
+    password: "6H2a6L8s#6H2a6L8s"
+    subject: JOB-report 
+    body: "Diar User!  Job coplete! Installation MongoDB Community on CenOS 7 "
+    from: "jobnotify@ucloudspace.am"
+    to:  "{{ Usrmail }}"
+    #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+    #attach: /etc/group /tmp/pavatar2.png
+    headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+    charset: utf8
+#  delegate_to: localhost 
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after MongoDB installation"
+  async: 1
+  poll: 0
+  ignore_errors: true      
+
+

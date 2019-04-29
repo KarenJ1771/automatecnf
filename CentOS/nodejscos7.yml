@@ -1,0 +1,73 @@
+- name: Nodejs script download
+  get_url: 
+    url: https://rpm.nodesource.com/setup_8.x 
+    dest: /tmp/nodejsetup.sh
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "7" or ansible_distribution == 'Red Hat Enterprise Linux'  
+
+- yum:
+    name: libselinux-python
+    state: latest
+  when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux'   
+
+- copy:
+    src: "res1/nodejsetup.sh"
+    dest: /tmp/nodejsetup.sh
+    owner: root
+    group: root
+    mode: 0755
+  when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "6" or ansible_distribution == 'Red Hat Enterprise Linux' 
+  
+- name: config change
+  lineinfile: dest=/tmp/nodejsetup.sh regexp="#!/bin/bash" line="#!/usr/bin/bash"
+  when: ansible_distribution == 'CentOS'  and ansible_distribution_major_version == "7" or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: Nodejs script start
+  shell: /tmp/nodejsetup.sh
+
+- yum:
+    name: nodejs
+    state: latest 
+
+- yum:
+    name: bzip2
+    state: latest 
+
+- yum:
+    name: gcc-c++
+    state: latest     
+
+- yum:
+    name: make
+    state: latest
+
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "/tmp/nodejsetup.sh"
+
+# #AWX job notify
+- mail:
+    host: mx.ucloudspace.am
+    port: 25
+    secure: starttls
+    username: "jobnotify@ucloudspace.am"
+    password: "6H2a6L8s#6H2a6L8s"
+    subject: JOB-report 
+    body: "Diar User!  Job coplete! Installation NodeJS v8 on CenOS 6 or 7 ."
+    from: "jobnotify@ucloudspace.am"
+    to:  "{{ Usrmail }}"
+    #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+    #attach: /etc/group /tmp/pavatar2.png
+    headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+    charset: utf8
+#  delegate_to: localhost 
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after NodeJS installation"
+  async: 1
+  poll: 0
+  ignore_errors: true

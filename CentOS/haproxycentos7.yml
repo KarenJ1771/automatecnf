@@ -1,0 +1,64 @@
+### source: https://www.upcloud.com/support/haproxy-load-balancer-centos/ ###
+- yum:
+     name: gcc
+     state: latest
+
+- yum:
+     name: pcre-static
+     state: latest
+
+- yum:
+     name: pcre-devel
+     state: latest
+
+- copy:
+    src: res1/haproxy17.tar.gz
+    dest: /opt/haproxy17.tar.gz
+    owner: root
+    group: root
+    mode: 0644
+
+- command: "tar -xzvf /opt/haproxy17.tar.gz -C /opt"
+- name: Clean artifact path
+  file:
+    state: absent
+    path: "/opt/haproxy17.tar.gz"
+
+- name: Make ha
+  command: chdir=/opt/haproxy-1.7.11 make TARGET=linux2628
+
+- name: Make install ha
+  command: chdir=/opt/haproxy-1.7.11 make install
+
+- command: "mkdir -p /etc/haproxy"
+- command: "mkdir -p /var/lib/haproxy"
+- command: "touch /var/lib/haproxy/stats"
+- command: "ln -s /usr/local/sbin/haproxy /usr/sbin/haproxy" 
+- command: "cp /opt/haproxy-1.7.11/examples/haproxy.init /etc/init.d/haproxy"
+- command: "chmod 755 /etc/init.d/haproxy"
+- command: "systemctl daemon-reload"
+- command: "chkconfig haproxy on"
+- command: "useradd -r haproxy"
+- command: "haproxy -v"
+
+- firewalld:
+     zone: public
+     service: http
+     permanent: true
+     state: enabled
+
+- firewalld:
+     port: 8181/tcp
+     permanent: true
+     state: enabled
+
+- command: "sudo firewall-cmd --reload"     
+ 
+- copy:
+    src: res1/haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+
+### Connect statistics http://<load balancer public IP>:8181 #####    

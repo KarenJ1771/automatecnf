@@ -1,0 +1,10 @@
+- yum:
+     name: java-1.8.0-openjdk
+     state: latest
+- yum:
+     name: java-1.8.0-openjdk-devel
+     state: latest
+
+#- service:
+#     name: httpd
+#     state: restarted

@@ -1,0 +1,60 @@
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+
+- yum:
+    name: nginx
+    state: latest 
+
+- service:
+     name: nginx
+     state: started
+     enabled: yes
+
+- firewalld:
+     zone: public
+     service: http
+     permanent: true
+     state: enabled
+
+- firewalld:
+     zone: public
+     service: https
+     permanent: true
+     state: enabled
+
+- firewalld:
+     port: 80/tcp
+     permanent: true
+     state: enabled
+
+- command: "sudo firewall-cmd --reload"      
+
+#AWX job notify
+- mail:
+    host: mx.ucloudspace.am
+    port: 25
+    secure: starttls
+    username: "jobnotify@ucloudspace.am"
+    password: "6H2a6L8s#6H2a6L8s"
+    subject: JOB-report 
+    body: "Diar User!  Job coplete! Installation NGINX web server on CenOS 7.
+           The default server root directory (top level directory containing configuration files): /etc/nginx.
+           The main Nginx configuration file: /etc/nginx/nginx.conf.
+           Server block (virtual hosts) configurations can be added in: /etc/nginx/conf.d.
+           The default server document root directory (contains web files): /usr/share/nginx/html."
+    from: "jobnotify@ucloudspace.am"
+    to:  "{{ Usrmail }}"
+    #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+    #attach: /etc/group /tmp/pavatar2.png
+    headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+    charset: utf8
+
+- name: Restart server
+  become: yes
+  shell: sleep 2 && /sbin/shutdown -r now "System restart after NGINX installation"
+  async: 1
+  poll: 0
+  ignore_errors: true 
+  
