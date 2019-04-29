@@ -1,0 +1,37 @@
+###############################################################################################
+###   https://docs.ansible.com/ansible/latest/modules/win_psexec_module.html#requirements  ####
+###############################################################################################
+
+# FOR WINDOWS 2008 SP1
+
+
+
+# 1. in windows cmd command>
+
+winrm quickconfig
+
+or 
+
+winrm quickconfig -transport:https
+
+
+# 2. change powershell v2 to v3 
+
+start powershell as administrator an start
+
+.\Upgrade-PowerShell_OK.ps1
+
+# 3. Configure Remoting for ansible 
+
+.\ConfigureRemotingForAnsible.ps1
+###########################################################################
+####  https://docs.microsoft.com/en-us/sysinternals/downloads/psexec   ####
+###########################################################################
+
+# 4. Copy psexec.exe to C:\WINDOWS\SYSTEM32
+
+and Connect linux ansible 
+############################################################################
+#####   https://github.com/diyan/pywinrm                              ######
+############################################################################
+pip install pywinrm
