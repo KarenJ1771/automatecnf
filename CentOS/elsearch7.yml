@@ -1,0 +1,24 @@
+- include_tasks: "jrecentos7.yml"
+- name: Remote elasticsearch RPM install with yum
+  yum: name=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.3.noarch.rpm
+
+- name: enable service elasticsearch and ensure it is not masked
+  systemd:
+    name: elasticsearch
+    enabled: yes
+    masked: no
+    
+### Запустится после настройки /etc/elasticsearch/elasticsearch.yml  
+#### ---link: https://www.digitalocean.com/community/tutorials/how-to-install-and-configure-elasticsearch-on-centos-7
+
+# - name: restart service elasticsearch on centos, in all cases, also issue daemon-reload to pick up config changes
+#   systemd:
+#     state: restarted
+#     daemon_reload: yes
+#     name: elasticsearch
+
+# ### ---- If elasticsearch is generic server in network ---###
+# - firewalld:
+#      port: 9200/tcp
+#      permanent: true
+#      state: enabled
