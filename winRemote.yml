@@ -15,7 +15,7 @@
 #     ansible_paramiko_pass: "{{ passR }}"
 #      ansible_ssh_private_key_file: /path/to/private_key
 #      ansible_ssh_pass: passphrase_for_private_key
-### --- ansible-playbook -i 176.32.195.101, --extra-vars 'usrR=Administrator  Usrmail=k.jalovyan@gmail.com rdp=0' winRemote.yml -vvv ---###
+### --- ansible-playbook -i SRV_IP_ADDRESS, --extra-vars 'usrR=Administrator  Usrmail=k.jalovyan@gmail.com rdp=0' winRemote.yml -vvv ---###
   tasks:         
     #  - name: Check RDP enable with powershell
     #    win_command: powershell.exe Get-WmiObject -Class Win32_TerminalServiceSetting -Namespace root\CIMV2\TerminalServices -Computer localhost -Authentication 6
