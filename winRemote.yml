@@ -5,8 +5,8 @@
   connection: winrm
   vars:
       ansible_user: "{{ usrR }}"
-#      ansible_password: "{{ passR }}"
-      ansible_password: "winAdminPass"
+#      ansible_password: "{{ passR }}"      
+      ansible_password: "AdminPass"      
       ansible_connection: winrm
       ansible_winrm_server_cert_validation: ignore
 #      http_port: 80
@@ -15,15 +15,85 @@
 #     ansible_paramiko_pass: "{{ passR }}"
 #      ansible_ssh_private_key_file: /path/to/private_key
 #      ansible_ssh_pass: passphrase_for_private_key
-  tasks: 
-     - debug: msg=" OS is {{ansible_distribution}}"    
-     - name: Test the PsExec connection to the local system (target node) with your user       
-       win_psexec:
-         #command: whoami.exe
-         #command: ipconfig.exe > C:\Users\Administrator\Documents\ip.txt
-         command: '-i C:\Users\Administrator\Documents\PSTools\pskill.exe -t firefox.exe'
-         #interactive: no
-         #system: yes
+### --- ansible-playbook -i 176.32.195.101, --extra-vars 'usrR=Administrator  Usrmail=k.jalovyan@gmail.com rdp=0' winRemote.yml -vvv ---###
+  tasks:         
+    #  - name: Check RDP enable with powershell
+    #    win_command: powershell.exe Get-WmiObject -Class Win32_TerminalServiceSetting -Namespace root\CIMV2\TerminalServices -Computer localhost -Authentication 6
+    #    register: output
+       
+    #  - debug: msg={{output}}
+
+     ### ----- Add in command rdp=0 or rdp=1 ----- OK! ########
+
+     - name: Access/Allow  RDP(rdp=0 or 1)
+       win_command: powershell.exe (Get-WmiObject -Class Win32_TerminalServiceSetting -Namespace root\CIMV2\TerminalServices -Computer localhost -Authentication 6).SetAllowTSConnections({{ rdp }},{{ rdp }})
+     - fail: msg="rdp=0 or 1"
+       when: rdp is undefined
+     - name: Check RDP enable with powershell
+       win_command: powershell.exe Get-WmiObject -Class Win32_TerminalServiceSetting -Namespace root\CIMV2\TerminalServices -Computer localhost -Authentication 6 
+       
+    ###-----------------------------------------------------------------------------------------------------------------------------------------------------------###
+    ### ----- Copy files in public download directory ----- OK! ###
+
+    #  - debug: msg=" OS is {{ansible_distribution}}" 
+    #  - name: Copy PSTools
+    #    win_copy:
+    #       src: ./WIN/PSTools.zip
+    #       dest: C:\Users\Public\Downloads\
+    #  - name: Copy winzip msi package
+    #    win_copy:
+    #       src: ./WIN/wzipse40.msi
+    #       dest: C:\Users\Public\Downloads\
+    ### ---- Install msi package --------------------OK! ###
+    #  - name: Install winzip msi package    
+    #    win_package:
+    #       path: C:\Users\Public\Downloads\wzipse40.msi 
+    #       product_id: '{CF2BEA3C-26EA-32F8-AA9B-331F7E34BAXX}'
+    #       #arguments: /q /n
+    #       state: present
+
+    ### ----- Install Windows Updates ------------------ OK! ###
+    # - name: Sow message on Desktop "Automated upgrade"
+    #    win_msg:
+    #      display_seconds: 60
+    #      msg: Automated upgrade about to start.   
+
+    #  - name: Install all security, critical, and rollup updates
+    #    win_updates:
+    #      category_names:
+    #        - SecurityUpdates
+    #        - CriticalUpdates
+    #        - UpdateRollups
+
+    #  - name: Test the PsExec connection to the local system (target node) with your user  
+    #    win_command: shutdown -f -r -t 00 
+
+    ### ----------------------------------------------------------------------------------------------------------------------------------------------- ### 
+
+
+
+
+    #  win_psexec:
+    #      ##command: whoami.exe
+    #      #command: ipconfig /all 
+    #     command: shutdown -f -r -t 00 
+         #register: output
+
+      #  win_command: msiexec.exe /i C:\Users\Public\Downloads\wzcline60-64.msi /qn            
+      # - name: Run command that only runs if folder exists and runs from a specific folder
+      #   win_command: C:\Windows\System32\msiexec.exe /i C:\Users\Public\Downloads\wzipse40.msi /qn
+      #   args:
+      #     chdir: C:\Users\Public\Downloads\
+         #creates: C:\backup\      
+          
+
+    ###-----------------------------------------------###
+    #  - name: PRINT OUT THE OUTPUT VARIABLE
+    #    debug:
+    #      var: output                   
+    #      command: '-i C:\Users\Administrator\Documents\PSTools\pskill.exe -t firefox.exe'
+         ##interactive: no
+         ##system: yes
 #      - name: Windows product key My Variant 
 #        win_psexec:
 #           command: '-i cscript c:\windows\system32\slmgr.vbs /ipk <enter your 25-digit product key here>'           
