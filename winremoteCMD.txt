@@ -1,0 +1,1 @@
+ansible-playbook -i SRV_IP_ADDRESS, --extra-vars 'usrR=Administrator  Usrmail=k.jalovyan@gmail.com rdp=1' winRemote.yml -vvv
