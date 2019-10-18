@@ -1,0 +1,47 @@
+- include_tasks: "jreU16.yml"
+- name: install apt-transport-https
+  apt: name=apt-transport-https update_cache=yes state=latest
+- name: add elasticsearch apt-key
+  apt_key: 
+    url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    state: present  
+
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install elasticsearch
+  apt: name=elasticsearch update_cache=yes state=latest
+
+- name: enable service elasticsearch and ensure it is not masked
+  systemd:
+    name: elasticsearch
+    enabled: yes
+    masked: no
+
+- service:
+     name: elasticsearch
+     state: restarted
+     enabled: yes
+
+- mail:
+   host: mx.ucloudspace.am
+   port: 25
+   secure: starttls
+   username: "jobnotify@ucloudspace.am"
+   password: "6H2a6L8s#6H2a6L8s"
+   subject: JOB-report 
+   body: "Diar User!  Job coplete! Installation Java 1.8 and Elasticsearch  on UBUNTU 16 LTS ."
+   from: "jobnotify@ucloudspace.am"
+   to:  "{{ Usrmail }}"
+   #to: John Doe <j.d@example.org>, Suzie Something <sue@example.com>
+   #attach: /etc/group /tmp/pavatar2.png
+   headers: 'noReply-To=john@example.com|X-Special="Something or other"'
+   charset: utf8
+
+### --- link: https://itsecforu.ru/2018/10/16/%D0%BA%D0%B0%D0%BA-%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B8%D1%82%D1%8C-elasticsearch-%D0%BD%D0%B0-ubuntu-18-04-%D0%B8-16-04-lts/ ----###
