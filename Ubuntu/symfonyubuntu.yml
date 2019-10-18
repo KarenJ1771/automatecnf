@@ -1,0 +1,16 @@
+- include_tasks: "lampubuntu.yml"
+- name: Download symfony phar to /usr/local/bin/symfony
+  get_url:
+    url: https://symfony.com/installer
+    dest: /usr/local/bin/symfony
+    mode: '0775'
+
+- debug:
+    msg:
+      - " !!!! Notice !!!!"
+      - " Symfony file is a phar !!!!"
+      - " cd /var/www/html and symfony new myproj "
+      - " Second line "
+      - " php myproj/bin/symfony_requirements "  
+      - " php bin/console server:run "  
+      - " http://127.0.0.1:8000 or http://localhost:8000  "
