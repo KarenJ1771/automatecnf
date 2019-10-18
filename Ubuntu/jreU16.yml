@@ -1,0 +1,37 @@
+- name: Upgrade all packages to the latest version
+  apt:
+    name: "*"
+    state: latest
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install default-jre
+  apt: name=default-jre update_cache=yes state=latest
+
+- apt_repository:
+    repo: ppa:webupd8team/java
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: dist
+
+- name: install oracle-java8-installer
+  apt: name=oracle-java8-installer update_cache=yes state=latest
+
+- name: set java home as environment variable
+      blockinfile:
+        insertafter: EOF
+        path: /etc/environment
+        block: export JAVA_HOME=/usr/lib/jvm/java-8-oracle
+
+#   - name: Adding the path in the Profile files
+#    lineinfile: dest=/root/.bash_profile line='export PATH=$PATH:{{install_path}}/{{mysql_folder_name}}/bin' insertafter='EOF' regexp='export PATH=\$PATH:{{install_path}}/{{mysql_folder_name}}/bin' state=present
+
+#  - name: Source the bash_profile file
+#    shell: source /root/.bash_profile
+
+#  - name: Start the mysql client
+#    shell: mysql -e "show databases";
+       
