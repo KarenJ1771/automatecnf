@@ -7,49 +7,31 @@
     ansible_ssh_user: "{{ usrR }}"
     ansible_ssh_pass: "{{ passR }}"
   tasks:
-#    - shell: "chdir=/opt"
-#    - get_url:
-#        url: "http://176.32.192.110/fsextender.tar.gz"
-#        dest: "/opt/fsextender.tar.gz"
-#        mode: 0755
-#    - command: "tar -xzvf /opt/fsextender.tar.gz -C /opt"
+    - name: Get fsextender
+      get_url:
+        url: "http://176.32.192.110/fsextender.tar.gz"
+        dest: "/opt/fsextender.tar.gz"
+        mode: 0755
+    - shell: tar -xzvf /opt/fsextender.tar.gz -C /opt
+    - shell: df -ah | grep '/dev/mapper/*' | awk 'BEGIN {FS=" "}{print $1}'
+      register: myDF
+    - set_fact: 
+        myDFfs={{ myDF.stdout }}
+    - shell: /opt/fsextender --do {{myDFfs}}
+    - ipify_facts:
+      # - debug:
+      #     msg: "{{ipify_public_ip }}"
+    - name: Reboot node and stop polling.
+      shell: reboot
+      async: 10 # Do not care for 10 sec
+      poll: 0 # Fire & Forget      
+    - name: "Wait for reboot"
+      local_action: wait_for host={{ ansible_default_ipv4.address }} port=22 delay=10 state=started
+      become: false
 
- #    - raw: lvdisplay -C|awk '$1=="root" {print $2}'
- #    - command: blkid 
-     - name: Get partition list
-       command: lsblk
-       register: lsblk_list
-       changed_when: false
-     - name: Rescan LVM Volume Groups
-       command: vgscan
-       #when: ((lvm__register_devices_filter|d() and lvm__register_devices_filter.changed) or
-       #      (lvm__register_devices_global_filter|d() and lvm__register_devices_global_filter.changed))
+    - name: Check the uptime post reboot
+      shell: uptime
+      register: UPTIME_POST_REBOOT
 
-  #  - name: test connection
-  #    command: "ping -c 4 {{ vmIP }}"
-  #    #command: "ping -c 4 19.8.0.1 "
-  #    register: result
-  #   ignore_errors: True
-  #  - wait_for:
-  #      host: "{{ vmIP }}"
-  #      port: 22
-  #      delay: 10
-  #      timeout: 300
-  #      state: started
-        #connect_timeout: 10
-  #      register: result
-###      ignore_errors: True
-    #- wait_for:
-    #    host: "{{ vmIP }}"
-    #    port: 22
-    #    delay: 10
-    #    timeout: 300
-    #    state: started
-    #- add_host:
-    #     group: temp_inventory
-    #     name: "{{ vmIP }}"
-    #     hosts: temp_inventory
-
-
-
-
+    - debug: msg={{UPTIME_POST_REBOOT.stdout}}               
+    - shell: /opt/fsextender --do {{myDFfs}}
